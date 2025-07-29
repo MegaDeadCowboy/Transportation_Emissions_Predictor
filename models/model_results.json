@@ -1,0 +1,77 @@
+{
+  "baseline_linear": {
+    "r2_train": 0.9998283426058749,
+    "rmse_train": 0.5223217856540193,
+    "mae_train": 0.4231070447853469,
+    "r2_cv_mean": NaN,
+    "r2_cv_std": NaN,
+    "rmse_cv_mean": 15.9358299484166,
+    "rmse_cv_std": 31.147043316685572,
+    "cv_scores": [
+      NaN,
+      NaN,
+      NaN,
+      NaN,
+      NaN,
+      NaN,
+      NaN,
+      NaN,
+      NaN,
+      NaN
+    ]
+  },
+  "ridge": {
+    "r2_train": 0.99617557665695,
+    "rmse_train": 2.4654140282671286,
+    "r2_cv_mean": NaN,
+    "r2_cv_std": NaN
+  },
+  "lasso": {
+    "r2_train": 0.9995959148332533,
+    "rmse_train": 0.8013889261420157,
+    "r2_cv_mean": NaN,
+    "r2_cv_std": NaN
+  },
+  "random_forest": {
+    "r2_train": 0.9233161890743599,
+    "rmse_train": 11.039736979292678,
+    "r2_cv_mean": NaN,
+    "r2_cv_std": NaN,
+    "feature_importance": {
+      "feature": {
+        "1": "real_gdp_millions",
+        "12": "gdp_efficiency_interaction",
+        "2": "vmt_millions",
+        "13": "pop_gdp_interaction",
+        "9": "gdp_vs_national_ratio",
+        "0": "population",
+        "10": "gdp_vs_national_deviation",
+        "11": "pop_vmt_interaction",
+        "4": "emissions_per_gdp",
+        "5": "gdp_per_capita",
+        "7": "emissions_per_1000_pop",
+        "3": "emissions_per_capita",
+        "8": "emissions_per_capita_3yr_avg",
+        "6": "emissions_intensity",
+        "14": "gdp_per_emission_unit"
+      },
+      "importance": {
+        "1": 0.12665150775491518,
+        "12": 0.1253767266770428,
+        "2": 0.11664591841689126,
+        "13": 0.11481241574825124,
+        "9": 0.0909802606013095,
+        "0": 0.07423677627766097,
+        "10": 0.06717304144280913,
+        "11": 0.050783195040986516,
+        "4": 0.04759732332730689,
+        "5": 0.04064312834852961,
+        "7": 0.03917397697491816,
+        "3": 0.0345805685471077,
+        "8": 0.03219383127550381,
+        "6": 0.02945744933356769,
+        "14": 0.009693880233199568
+      }
+    }
+  }
+}
