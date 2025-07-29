@@ -2,10 +2,6 @@
 
 **A machine learning tool for predicting state-level transportation greenhouse gas emissions using economic, demographic, and policy indicators.**
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://python.org)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.25%2B-red.svg)](https://streamlit.io)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
 ## Overview
 
 This project creates an interactive dashboard and predictive model for state-level transportation emissions, enabling policymakers to compare state efficiency, predict emissions, simulate policy scenarios, and identify best practices. The analysis demonstrates that Vehicle Miles Traveled (VMT) explains 75.9% of state emission variation, providing a clear policy lever for emission reduction.
@@ -37,7 +33,7 @@ This project creates an interactive dashboard and predictive model for state-lev
 
 ### Setup
 ```bash
-git clone https://github.com/your-username/transportation-emissions-predictor.git
+git clone https://github.com/MegaDeadCowboy/Transportation_Emissions_Predictor.git
 cd transportation-emissions-predictor
 pip install -r requirements.txt
 ```
@@ -163,11 +159,11 @@ This project demonstrates core capabilities needed for climate policy analysis:
 
 ## Contact
 
-[Your Name] - [your.email@example.com]
+[Carver Rasmussen] - [carver.rasmussen@gmail.com]
 
-Project Repository: [https://github.com/your-username/transportation-emissions-predictor]
+Project Repository: [https://github.com/MegaDeadCowboy/Transportation_Emissions_Predictor]
 
-Live Dashboard: [http://localhost:8501] (when running locally)
+Live Dashboard: [http://localhost:8501]
 
 ## License
 
