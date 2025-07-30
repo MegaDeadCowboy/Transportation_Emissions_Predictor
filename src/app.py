@@ -1,14 +1,11 @@
 # Transportation Emissions Predictor Dashboard
-# Hours 7-8: Interactive Dashboard Creation
-# EcoDataLab Application Project - Final Phase
+# Streamlit Cloud Deployment Version
 
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-import joblib
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -80,32 +77,11 @@ st.markdown("""
 
 @st.cache_data
 def load_data():
-    """Load the enhanced dataset and models."""
-    try:
-        df = pd.read_csv('data/processed/enhanced_dataset.csv')
-        return df
-    except FileNotFoundError:
-        # Create sample data if files not found
-        st.warning("⚠️ Enhanced dataset not found. Using sample data for demonstration.")
-        return create_sample_data()
-
-@st.cache_data
-def load_models():
-    """Load the trained models."""
-    try:
-        results = joblib.load('models/simple_results.pkl')
-        features = joblib.load('models/simple_features.pkl')
-        return results, features
-    except FileNotFoundError:
-        st.warning("⚠️ Models not found. Using demo results.")
-        return create_demo_results()
-
-def create_sample_data():
-    """Create sample data for demonstration."""
+    """Load sample data for demonstration (works without local files)."""
     states = ['CA', 'TX', 'NY', 'FL', 'IL', 'PA', 'OH', 'GA', 'NC', 'MI']
     data = []
     
-    # Realistic data based on actual patterns
+    # Realistic data based on actual transportation emission patterns
     state_data = {
         'CA': {'emissions': 150.2, 'population': 39538223, 'gdp': 3598103, 'vmt': 340000},
         'TX': {'emissions': 200.1, 'population': 30029572, 'gdp': 2417542, 'vmt': 280000},
@@ -130,13 +106,14 @@ def create_sample_data():
             'emissions_per_capita': values['emissions'] * 1000000 / values['population'],
             'vmt_per_capita': values['vmt'] * 1000000 / values['population'],
             'gdp_per_capita': values['gdp'] * 1000000 / values['population'],
-            'data_source': 'demo'
+            'data_source': 'sample'
         })
     
     return pd.DataFrame(data)
 
-def create_demo_results():
-    """Create demo model results."""
+@st.cache_data
+def load_model_results():
+    """Load model results for demonstration."""
     results = {
         'single_predictor': {
             'feature': 'vmt_millions',
@@ -160,7 +137,7 @@ def create_demo_results():
 
 def create_national_overview(df):
     """Create the national overview dashboard."""
-    st.markdown("<h1 class='main-header'>🌱 Transportation Emissions Predictor</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='main-header'>Transportation Emissions Predictor</h1>", unsafe_allow_html=True)
     st.markdown("**A machine learning tool for predicting state-level transportation greenhouse gas emissions**")
     
     # Key metrics
@@ -172,56 +149,46 @@ def create_national_overview(df):
     efficiency_leader = df.loc[df['emissions_per_capita'].idxmin(), 'state_code']
     
     with col1:
-        st.markdown("""
+        st.markdown(f"""
         <div class='metric-container'>
-            <h3>🏭 Total Emissions</h3>
-            <h2>{:.1f} MMT CO₂</h2>
+            <h3>Total Emissions</h3>
+            <h2>{total_emissions:.1f} MMT CO₂</h2>
             <p>Combined transportation emissions</p>
         </div>
-        """.format(total_emissions), unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
     
     with col2:
-        st.markdown("""
+        st.markdown(f"""
         <div class='metric-container'>
-            <h3>👥 Average Per Capita</h3>
-            <h2>{:.1f} tons/person</h2>
+            <h3>Average Per Capita</h3>
+            <h2>{avg_per_capita:.1f} tons/person</h2>
             <p>Transportation emissions per person</p>
         </div>
-        """.format(avg_per_capita), unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
     
     with col3:
-        st.markdown("""
+        st.markdown(f"""
         <div class='metric-container'>
-            <h3>🚗 Total VMT</h3>
-            <h2>{:.0f}B miles</h2>
+            <h3>Total VMT</h3>
+            <h2>{total_vmt/1000:.0f}B miles</h2>
             <p>Vehicle miles traveled</p>
         </div>
-        """.format(total_vmt/1000), unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
     
     with col4:
-        st.markdown("""
+        st.markdown(f"""
         <div class='metric-container'>
-            <h3>🏆 Efficiency Leader</h3>
-            <h2>{}</h2>
+            <h3>Efficiency Leader</h3>
+            <h2>{efficiency_leader}</h2>
             <p>Lowest emissions per capita</p>
         </div>
-        """.format(efficiency_leader), unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
     
     # Choropleth map
-    st.subheader("🗺️ Transportation Emissions by State")
-    
-    # Create state mapping for visualization
-    state_mapping = {
-        'CA': 'California', 'TX': 'Texas', 'NY': 'New York', 'FL': 'Florida',
-        'IL': 'Illinois', 'PA': 'Pennsylvania', 'OH': 'Ohio', 'GA': 'Georgia',
-        'NC': 'North Carolina', 'MI': 'Michigan'
-    }
-    
-    df_map = df.copy()
-    df_map['state_name'] = df_map['state_code'].map(state_mapping)
+    st.subheader("Transportation Emissions by State")
     
     fig_map = px.choropleth(
-        df_map,
+        df,
         locations='state_code',
         color='transport_co2_mmt',
         locationmode='USA-states',
@@ -239,7 +206,7 @@ def create_national_overview(df):
     st.plotly_chart(fig_map, use_container_width=True)
     
     # Top insights
-    st.subheader("💡 Key Insights")
+    st.subheader("Key Insights")
     
     col1, col2 = st.columns(2)
     
@@ -277,7 +244,7 @@ def create_national_overview(df):
 
 def create_state_deep_dive(df):
     """Create state-specific analysis."""
-    st.header("🔍 State Deep Dive Analysis")
+    st.header("State Deep Dive Analysis")
     
     # State selector
     selected_state = st.selectbox(
@@ -294,15 +261,13 @@ def create_state_deep_dive(df):
     with col1:
         st.metric(
             "Total Emissions",
-            f"{state_data['transport_co2_mmt']:.1f} MMT CO₂",
-            delta=None
+            f"{state_data['transport_co2_mmt']:.1f} MMT CO₂"
         )
     
     with col2:
         st.metric(
             "Emissions per Capita",
-            f"{state_data['emissions_per_capita']:.2f} tons/person",
-            delta=None
+            f"{state_data['emissions_per_capita']:.2f} tons/person"
         )
     
     with col3:
@@ -310,66 +275,11 @@ def create_state_deep_dive(df):
         delta_pct = ((state_data['emissions_per_capita'] - national_avg) / national_avg) * 100
         st.metric(
             "vs National Average",
-            f"{delta_pct:+.1f}%",
-            delta=f"{delta_pct:+.1f}% vs avg"
+            f"{delta_pct:+.1f}%"
         )
     
     # Multi-variable analysis
-    st.subheader(f"📊 {selected_state} Performance Analysis")
-    
-    # Create comparison with national averages
-    metrics = ['transport_co2_mmt', 'emissions_per_capita', 'vmt_per_capita', 'gdp_per_capita']
-    metric_labels = ['Total Emissions (MMT)', 'Emissions/Capita (tons)', 'VMT/Capita (miles)', 'GDP/Capita ($)']
-    
-    fig_radar = go.Figure()
-    
-    # Normalize values for radar chart
-    state_values = []
-    national_values = []
-    
-    for metric in metrics:
-        state_val = state_data[metric]
-        national_avg = df[metric].mean()
-        national_max = df[metric].max()
-        
-        # Normalize to 0-1 scale
-        state_normalized = state_val / national_max
-        national_normalized = national_avg / national_max
-        
-        state_values.append(state_normalized)
-        national_values.append(national_normalized)
-    
-    fig_radar.add_trace(go.Scatterpolar(
-        r=state_values,
-        theta=metric_labels,
-        fill='toself',
-        name=selected_state,
-        line_color='red'
-    ))
-    
-    fig_radar.add_trace(go.Scatterpolar(
-        r=national_values,
-        theta=metric_labels,
-        fill='toself',
-        name='National Average',
-        line_color='blue',
-        opacity=0.6
-    ))
-    
-    fig_radar.update_layout(
-        polar=dict(
-            radialaxis=dict(
-                visible=True,
-                range=[0, 1]
-            )),
-        showlegend=True,
-        title=f"{selected_state} vs National Average Performance"
-    )
-    
-    st.plotly_chart(fig_radar, use_container_width=True)
-    
-    # Key relationships
-    st.subheader("🔗 Key Relationships")
+    st.subheader(f"{selected_state} Performance Analysis")
     
     # Scatter plot: VMT vs Emissions
     fig_scatter = px.scatter(
@@ -405,11 +315,11 @@ def create_state_deep_dive(df):
 
 def create_policy_simulator(df, results):
     """Create policy scenario simulator."""
-    st.header("🎯 Policy Scenario Simulator")
+    st.header("Policy Scenario Simulator")
     
     st.markdown("""
     <div class='insight-box'>
-        <h4>💡 Model Insights</h4>
+        <h4>Model Insights</h4>
         <p>Our analysis shows that <strong>Vehicle Miles Traveled (VMT)</strong> explains 75.9% of emission variation across states. 
         Use the simulator below to explore policy scenarios.</p>
     </div>
@@ -440,7 +350,7 @@ def create_policy_simulator(df, results):
         )
     
     # Policy scenario sliders
-    st.subheader("🎛️ Policy Scenario Controls")
+    st.subheader("Policy Scenario Controls")
     
     col1, col2 = st.columns(2)
     
@@ -496,19 +406,17 @@ def create_policy_simulator(df, results):
     emission_change = ((projected_emissions - baseline_emissions) / baseline_emissions) * 100
     
     # Results display
-    st.subheader("📊 Scenario Results")
+    st.subheader("Scenario Results")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
         st.metric(
             "Baseline Emissions",
-            f"{baseline_emissions:.1f} MMT CO₂",
-            delta=None
+            f"{baseline_emissions:.1f} MMT CO₂"
         )
     
     with col2:
-        delta_color = "normal" if emission_change == 0 else ("inverse" if emission_change < 0 else "normal")
         st.metric(
             "Projected Emissions",
             f"{projected_emissions:.1f} MMT CO₂",
@@ -522,57 +430,22 @@ def create_policy_simulator(df, results):
             delta="Target: -50% by 2030"
         )
     
-    # Scenario breakdown
-    st.subheader("🔍 Impact Breakdown")
-    
-    impact_data = pd.DataFrame({
-        'Factor': ['VMT Change', 'Population', 'Economic Growth', 'Efficiency Gains'],
-        'Impact (%)': [vmt_impact * 100, pop_impact * 100, gdp_impact * 100, efficiency_impact * 100],
-        'Input Change (%)': [vmt_change, population_change, gdp_change, -efficiency_improvement]
-    })
-    
-    fig_waterfall = go.Figure()
-    
-    # Create waterfall chart
-    x_vals = impact_data['Factor'].tolist() + ['Net Effect']
-    y_vals = impact_data['Impact (%)'].tolist() + [sum(impact_data['Impact (%)'])]
-    colors = ['red' if y > 0 else 'green' for y in y_vals[:-1]] + ['blue']
-    
-    fig_waterfall.add_trace(
-        go.Bar(
-            x=x_vals,
-            y=y_vals,
-            marker_color=colors,
-            text=[f"{y:+.1f}%" for y in y_vals],
-            textposition='outside'
-        )
-    )
-    
-    fig_waterfall.update_layout(
-        title="Policy Impact Breakdown",
-        xaxis_title="Policy Factor",
-        yaxis_title="Emission Change (%)",
-        showlegend=False
-    )
-    
-    st.plotly_chart(fig_waterfall, use_container_width=True)
-    
     # Policy recommendations
-    st.subheader("💼 Policy Recommendations")
+    st.subheader("Policy Recommendations")
     
     if vmt_change < -10:
-        st.success("🎯 **Strong VMT Reduction**: This scenario represents ambitious transportation demand management. Consider policies like congestion pricing, improved public transit, and remote work incentives.")
+        st.success("**Strong VMT Reduction**: This scenario represents ambitious transportation demand management. Consider policies like congestion pricing, improved public transit, and remote work incentives.")
     elif vmt_change < 0:
-        st.info("📈 **Moderate VMT Reduction**: Good progress on transportation efficiency. Focus on urban planning and alternative transportation modes.")
+        st.info("**Moderate VMT Reduction**: Good progress on transportation efficiency. Focus on urban planning and alternative transportation modes.")
     elif vmt_change > 10:
-        st.warning("⚠️ **VMT Increase**: Rising travel demand. Consider this scenario for economic growth periods and plan accordingly.")
+        st.warning("**VMT Increase**: Rising travel demand. Consider this scenario for economic growth periods and plan accordingly.")
     
     if efficiency_improvement > 20:
-        st.success("🔧 **High Efficiency Gains**: Ambitious technology adoption. This could include rapid EV deployment, fuel efficiency standards, and smart transportation systems.")
+        st.success("**High Efficiency Gains**: Ambitious technology adoption. This could include rapid EV deployment, fuel efficiency standards, and smart transportation systems.")
 
 def create_state_comparison(df):
     """Create state comparison interface."""
-    st.header("⚖️ State Comparison Tool")
+    st.header("State Comparison Tool")
     
     # Multi-select for states
     selected_states = st.multiselect(
@@ -588,7 +461,7 @@ def create_state_comparison(df):
     comparison_df = df[df['state_code'].isin(selected_states)].copy()
     
     # Comparison metrics
-    st.subheader("📊 Side-by-Side Comparison")
+    st.subheader("Side-by-Side Comparison")
     
     metrics_to_compare = {
         'transport_co2_mmt': 'Total Emissions (MMT)',
@@ -643,76 +516,57 @@ def create_state_comparison(df):
             color_continuous_scale='RdYlGn_r'
         )
         st.plotly_chart(fig_comp2, use_container_width=True)
-    
-    # Performance ranking
-    st.subheader("🏆 Performance Rankings")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.write("**Efficiency Ranking** (Lower is Better)")
-        efficiency_rank = comparison_df.sort_values('emissions_per_capita')[['state_code', 'emissions_per_capita']]
-        for i, (_, row) in enumerate(efficiency_rank.iterrows(), 1):
-            medal = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"{i}."
-            st.write(f"{medal} {row['state_code']}: {row['emissions_per_capita']:.2f} tons/person")
-    
-    with col2:
-        st.write("**Total Impact Ranking** (Absolute Emissions)")
-        total_rank = comparison_df.sort_values('transport_co2_mmt', ascending=False)[['state_code', 'transport_co2_mmt']]
-        for i, (_, row) in enumerate(total_rank.iterrows(), 1):
-            icon = "🔴" if i == 1 else "🟡" if i == 2 else "🟢"
-            st.write(f"{icon} {row['state_code']}: {row['transport_co2_mmt']:.1f} MMT CO₂")
 
 def main():
     """Main dashboard application."""
     
     # Load data
     df = load_data()
-    results, features = load_models()
+    results, features = load_model_results()
     
-    # Sidebar navigation
-    st.sidebar.title("🌱 Navigation")
+    # Sidebar header
+    st.sidebar.markdown("# Navigation")
     st.sidebar.markdown("---")
     
     page = st.sidebar.selectbox(
         "Choose Analysis:",
-        ["🏠 National Overview", "🔍 State Deep Dive", "🎯 Policy Simulator", "⚖️ State Comparison"]
+        ["National Overview", "State Deep Dive", "Policy Simulator", "State Comparison"]
     )
     
     # Model info sidebar
     st.sidebar.markdown("---")
-    st.sidebar.markdown("### 🤖 Model Performance")
+    st.sidebar.markdown("### Model Performance")
     st.sidebar.metric("VMT Model R²", f"{results['single_predictor']['r2']:.3f}")
     st.sidebar.metric("Key Predictor", "Vehicle Miles Traveled")
     st.sidebar.metric("VMT Correlation", f"{results['single_predictor']['correlation']:.3f}")
     
     st.sidebar.markdown("---")
     st.sidebar.markdown("""
-    ### 📊 Data Sources
+    ### Data Sources
     - **EPA/EIA**: Transportation emissions
     - **Census**: Population data
     - **BEA**: Economic indicators  
     - **FHWA**: Vehicle miles traveled
     
-    ### 🎯 Built for EcoDataLab
+    ### Built for EcoDataLab
     Demonstrating climate policy analysis capabilities
     """)
     
     # Main content based on selection
-    if page == "🏠 National Overview":
+    if page == "National Overview":
         create_national_overview(df)
-    elif page == "🔍 State Deep Dive":
+    elif page == "State Deep Dive":
         create_state_deep_dive(df)
-    elif page == "🎯 Policy Simulator":
+    elif page == "Policy Simulator":
         create_policy_simulator(df, results)
-    elif page == "⚖️ State Comparison":
+    elif page == "State Comparison":
         create_state_comparison(df)
     
     # Footer
     st.markdown("---")
     st.markdown("""
     <div style='text-align: center; color: #666;'>
-        <p>🌱 Transportation Emissions Predictor | Built with Streamlit | EcoDataLab Application Project</p>
+        <p>Transportation Emissions Predictor | Built with Streamlit | EcoDataLab Application Project</p>
         <p>Predictive Model: R² = 0.83 | Key Finding: VMT explains 75.9% of emission variation</p>
     </div>
     """, unsafe_allow_html=True)
