@@ -27,8 +27,7 @@ This project creates an interactive dashboard and predictive model for state-lev
 - **Census Bureau**: State population and demographic data
 - **BEA**: State-level GDP and economic indicators
 - **FHWA**: Vehicle miles traveled statistics
-- **Feature Engineering**: 57 engineered features from 11 original variables
-
+- **Feature Engineering**: 57 features engineered, 5 core features selected for modeling to avoid overfitting
 ## Quick Start
 
 ### Setup
@@ -134,28 +133,6 @@ The interactive simulator demonstrates emission reduction potential:
 - Urban planning strategies that reduce travel demand
 - Public transportation and alternative mobility investments
 - Regional coordination for transportation policy
-
-## For EcoDataLab Application
-
-This project demonstrates core capabilities needed for climate policy analysis:
-
-**Technical Skills**
-- EPA data integration and emissions modeling
-- Federal dataset API usage and processing
-- Statistical analysis with policy interpretation
-- Interactive visualization for decision-makers
-
-**Domain Expertise**
-- Transportation-climate nexus understanding
-- State-level policy analysis capabilities
-- Economic-environmental modeling
-- Evidence-based recommendation development
-
-**Deliverable Quality**
-- Production-ready interactive dashboard
-- Validated statistical models with clear performance metrics
-- Professional documentation and reproducible analysis
-- Direct policy applicability and actionable insights
 
 ## Contact
 
