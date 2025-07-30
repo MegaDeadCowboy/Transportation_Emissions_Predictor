@@ -140,7 +140,7 @@ The interactive simulator demonstrates emission reduction potential:
 
 Project Repository: [https://github.com/MegaDeadCowboy/Transportation_Emissions_Predictor]
 
-Live Dashboard: [http://localhost:8501]
+Live Dashboard: [https://transportationemissionspredictor.streamlit.app/]
 
 ## License
 
